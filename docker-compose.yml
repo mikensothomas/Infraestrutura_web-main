@@ -1,0 +1,46 @@
+version: '3.9'
+
+services:
+  servidor:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: backend
+    privileged: true
+    networks:
+      rede_web:
+        ipv4_address: 100.0.0.10
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: frontend
+    privileged: true
+    networks:
+      rede_web:
+        ipv4_address: 100.0.0.2
+
+  banco:
+    build:
+      context: .
+      dockerfile: Dockerfile.banco
+    container_name: banco
+    privileged: true
+    networks:
+      rede_web:
+        ipv4_address: 100.0.0.3
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  rede_web:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 100.0.0.0/24
+
+volumes:
+  postgres_data:

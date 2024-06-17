@@ -1,0 +1,3 @@
+-- psql -U db_user -d db_name
+-- \dt
+-- SELECT * FROM messages;

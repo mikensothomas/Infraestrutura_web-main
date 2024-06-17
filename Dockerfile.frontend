@@ -1,0 +1,43 @@
+# Use a base image do Ubuntu 20.04
+FROM ubuntu:20.04
+
+# Instalar dependências do sistema, adicionar o PPA para Python 3.9 e instalar Python 3.9
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update && apt-get install -y \
+    python3.9 \
+    python3.9-venv \
+    python3.9-dev \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Cria um diretório para a aplicação
+WORKDIR /app
+
+# Cria e ativa um ambiente virtual
+RUN python3.9 -m venv venv
+ENV PATH="/app/venv/bin:$PATH"
+
+# Copia os arquivos requirements.txt para o contêiner
+COPY requirements.txt .
+
+# Instala as dependências Python no ambiente virtual
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Instala grpcio-tools dentro do ambiente virtual
+RUN pip install grpcio-tools
+
+# Copiar scripts para o diretório /app no contêiner
+COPY frontend.py .
+COPY messenger.proto .
+
+# Ativação do ambiente virtual
+ENV PATH="/app/venv/bin:$PATH"
+
+# Compila o arquivo .proto
+RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. messenger.proto
+
+# Comando para manter o container em execução
+CMD ["tail", "-f", "/dev/null"]

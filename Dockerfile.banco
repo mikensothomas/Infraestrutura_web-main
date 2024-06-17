@@ -1,0 +1,18 @@
+FROM ubuntu:latest
+
+# Dockerfile.banco
+
+# Use the official PostgreSQL image from Docker Hub
+FROM postgres:latest
+
+# Environment variables
+ENV POSTGRES_DB=db_name \
+    POSTGRES_USER=db_user \
+    POSTGRES_PASSWORD=12345
+
+# Copy custom initialization scripts
+COPY init.sql /docker-entrypoint-initdb.d/
+
+# Expose the PostgreSQL port
+EXPOSE 5432
+
